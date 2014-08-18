@@ -1,42 +1,59 @@
-/*
+ï»¿/*
 var blogInfo={};
-//µ±content_scriptÓĞÏûÏ¢·¢¹ıÀ´Ê±
+//å½“content_scriptæœ‰æ¶ˆæ¯å‘è¿‡æ¥æ—¶
 chrome.runtime.onMessage.addListener(function(request, sender, sendRequest){
 	blogInfo=request;
 });
 */
 
-//ĞèÒªµ²×¡µÄ¹ã¸æÁ¬½Ó£¨Ä¬ÈÏ£©
+//éœ€è¦æŒ¡ä½çš„å¹¿å‘Šè¿æ¥ï¼ˆé»˜è®¤ï¼‰
 var defaultBlockUrls=[
-"http://same.stockstar.com/*"
+"http://same.stockstar.com/*",
+"http://*.doubleclick.net/*",
+"*://*.googleadservices.com/*",
+"*://*.googlesyndication.com/*",
+"*://*.google-analytics.com/*",
+"*://creative.ak.fbcdn.net/*",
+"http://*.adbrite.com/*",
+"http://*.expo9.exponential.com/*",
+"http://*.quantserve.com/*",
+"http://*.scorecardresearch.com/*",
+"http://*.zedo.com/*"
 ];
-//µ±Ç°ĞèÒªµ²×¡µÄ¹ã¸æÁ¬½Ó
+//å½“å‰éœ€è¦æŒ¡ä½çš„å¹¿å‘Šè¿æ¥
 var currentBlockUrls=getBlockUrls();
-
+var blockAdCount=0;
 chrome.webRequest.onBeforeRequest.addListener(function(details) {  
-        setBadge();
+        blockAdCount++;
+		setBadge(blockAdCount);
 		//return {cancel: true};
 		return {redirectUrl: "about:blank"};
 },{urls: currentBlockUrls},["blocking"]);
 
-//ÉèÖÃÌáÊ¾£¬ÌáÊ¾ÔÚµ±Ç°Ò³Ãæµ²×¡ÁË¶àÉÙ¹ã¸æ
-function setBadge(){
+//æ–°é¡µé¢æ‰“å¼€ï¼ŒblockAdCounté‡ç½®ä¸º0
+chrome.extension.onRequest.addListener(function(message, sender, sendResponse){
+     blockAdCount=0;
+	 console.log(message);
+	 sendResponse("çŸ¥é“äº†");
+});
+
+//è®¾ç½®æç¤ºï¼Œæç¤ºåœ¨å½“å‰é¡µé¢æŒ¡ä½äº†å¤šå°‘å¹¿å‘Š
+function setBadge(count){
 	chrome.tabs.getSelected(null, function(tab) {
-		tab.blockCount=tab.blockCount||0;
-		tab.blockCount++;
 		chrome.browserAction.setBadgeBackgroundColor({tabId:tab.id,color: '#0000FF'});
-		chrome.browserAction.setBadgeText({tabId:tab.id,text: tab.blockCount.toString()});
+		chrome.browserAction.setBadgeText({tabId:tab.id,text: count.toString()});
 	});
 }
 
 function getBlockUrls(){
-	var urls=localStorage["BlockUrls"];
-	if (urls == undefined) {
+	var urls=JSON.parse(localStorage["BlockUrls"]);
+	if (!(urls instanceof Array)||urls.length<=0) {
 		console.log("Initializing BlockUrls to defaults.");
-		setFilters(defaultBlockUrls);
-		return defaultBlockUrls;
+		urls=defaultBlockUrls;
+		setBlockUrls(urls);
+		return urls;
 	} else {
-		return JSON.parse(urls);
+		return urls;
 	}
 }
 
