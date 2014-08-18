@@ -1,34 +1,67 @@
-﻿/*
-var blogInfo={};
-//当content_script有消息发过来时
-chrome.runtime.onMessage.addListener(function(request, sender, sendRequest){
-	blogInfo=request;
-});
-*/
+﻿
+var BlockUrlMgr=(function(){
+	var currentBlockUrls=null;
+	//需要屏蔽的广告连接（默认）
+	var defaultBlockUrls=[
+		"http://same.stockstar.com/*",
+		"http://*.doubleclick.net/*",
+		"*://*.googleadservices.com/*",
+		"*://*.googlesyndication.com/*",
+		"*://*.google-analytics.com/*",
+		"*://creative.ak.fbcdn.net/*",
+		"http://*.adbrite.com/*",
+		"http://*.expo9.exponential.com/*",
+		"http://*.quantserve.com/*",
+		"http://*.scorecardresearch.com/*",
+		"http://*.zedo.com/*"
+	];
+	//当前需要屏蔽的广告链接
+	function getCurrentBlockUrls(){
+		if(null==currentBlockUrls){
+			currentBlockUrls=getBlockUrls();
+		}
+		return currentBlockUrls;
+	}
+	
+	function getBlockUrls(){
+	     var blockUrlsStr=localStorage["BlockUrls"];
+		 var urls=null;
+		 if(blockUrlsStr){
+			try{
+				urls=JSON.parse(blockUrlsStr);
+			}catch(error){
+				console.log(error);
+			}
+		 }
+		 if (!(urls instanceof Array)||urls.length<=0) {
+			urls=defaultBlockUrls;
+			setBlockUrls(urls);
+			console.log("Initializing BlockUrls to defaults.");
+		}
+		return urls; 
+	}
+	
+	function setBlockUrls(urls) {
+		currentBlockUrls=urls;
+		localStorage["BlockUrls"] = JSON.stringify(urls);
+   }
+   return {
+	   getCurrentBlockUrls:getCurrentBlockUrls,
+	   getBlockUrls:getBlockUrls,
+	   setBlockUrls:setBlockUrls
+   };
+}());
 
-//需要挡住的广告连接（默认）
-var defaultBlockUrls=[
-"http://same.stockstar.com/*",
-"http://*.doubleclick.net/*",
-"*://*.googleadservices.com/*",
-"*://*.googlesyndication.com/*",
-"*://*.google-analytics.com/*",
-"*://creative.ak.fbcdn.net/*",
-"http://*.adbrite.com/*",
-"http://*.expo9.exponential.com/*",
-"http://*.quantserve.com/*",
-"http://*.scorecardresearch.com/*",
-"http://*.zedo.com/*"
-];
-//当前需要挡住的广告连接
-var currentBlockUrls=getBlockUrls();
+
+
+
 var blockAdCount=0;
 chrome.webRequest.onBeforeRequest.addListener(function(details) {  
         blockAdCount++;
 		setBadge(blockAdCount);
 		//return {cancel: true};
 		return {redirectUrl: "about:blank"};
-},{urls: currentBlockUrls},["blocking"]);
+},{urls: BlockUrlMgr.getCurrentBlockUrls()},["blocking"]);
 
 //新页面打开，blockAdCount重置为0
 chrome.extension.onRequest.addListener(function(message, sender, sendResponse){
@@ -45,19 +78,5 @@ function setBadge(count){
 	});
 }
 
-function getBlockUrls(){
-	var urls=JSON.parse(localStorage["BlockUrls"]);
-	if (!(urls instanceof Array)||urls.length<=0) {
-		console.log("Initializing BlockUrls to defaults.");
-		urls=defaultBlockUrls;
-		setBlockUrls(urls);
-		return urls;
-	} else {
-		return urls;
-	}
-}
 
-function setBlockUrls(urls) {
-    currentBlockUrls=urls;
-	localStorage["BlockUrls"] = JSON.stringify(urls);
-}
+

@@ -1,7 +1,7 @@
 
 $(function(){
-var page=chrome.extension.getBackgroundPage();
-var blockUrls=page.currentBlockUrls.sort();
+var BlockUrlMgr=chrome.extension.getBackgroundPage().BlockUrlMgr;
+var blockUrls=BlockUrlMgr.getCurrentBlockUrls().sort();
 
 loadUrls();
 $("#addUrl").click(function(){
@@ -33,7 +33,7 @@ function loadUrls(){
 function addUrl(url){
 	if(blockUrls.indexOf(url)==-1){
 		blockUrls.push(url);
-		page.setBlockUrls(blockUrls);
+		BlockUrlMgr.setBlockUrls(blockUrls);
 		return true;
 	}
 	return false;
@@ -44,7 +44,7 @@ function deleteUrl(url){
 	if(index!=-1){
 		blockUrls[index]=blockUrls[blockUrls.length-1];
 		blockUrls.pop();
-		page.setBlockUrls(blockUrls);
+		BlockUrlMgr.setBlockUrls(blockUrls);
 	}
 }
 })
