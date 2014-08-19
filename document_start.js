@@ -1,1 +1,0 @@
-chrome.extension.sendRequest("被注入的页面已经下载完了，但还没解析DOM",function(response){    console.log(response);});//var jsUrl=chrome.extension.getURL("alert.js");//var jsUrl="http://localhost:64228/contents/alert.js";//$("body").append("<script src='"+jsUrl+"'>");

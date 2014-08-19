@@ -1,7 +1,8 @@
 
 $(function(){
-var BlockUrlMgr=chrome.extension.getBackgroundPage().BlockUrlMgr;
-var blockUrls=BlockUrlMgr.getCurrentBlockUrls().sort();
+var page=chrome.extension.getBackgroundPage();
+var BlockUrlMgr=page.BlockUrlMgr;
+var blockUrls=BlockUrlMgr.getBlockUrls();
 
 loadUrls();
 $("#addUrl").click(function(){
@@ -12,6 +13,10 @@ $("#addUrl").click(function(){
 		}
 		$("#url").val("");
 	}
+});
+
+$("#saveBtn").click(function(){
+	page.restart();
 });
 
 function addRow(url,orderNum){
@@ -31,20 +36,10 @@ function loadUrls(){
 }
 
 function addUrl(url){
-	if(blockUrls.indexOf(url)==-1){
-		blockUrls.push(url);
-		BlockUrlMgr.setBlockUrls(blockUrls);
-		return true;
-	}
-	return false;
+	 return BlockUrlMgr.addBlockUrl(url);
 }
 
 function deleteUrl(url){
-	var index=blockUrls.indexOf(url);
-	if(index!=-1){
-		blockUrls[index]=blockUrls[blockUrls.length-1];
-		blockUrls.pop();
-		BlockUrlMgr.setBlockUrls(blockUrls);
-	}
+	 return BlockUrlMgr.removeBlockUrl(url);
 }
 })

@@ -1,82 +1,67 @@
-﻿
-var BlockUrlMgr=(function(){
-	var currentBlockUrls=null;
-	//需要屏蔽的广告连接（默认）
-	var defaultBlockUrls=[
-		"http://same.stockstar.com/*",
-		"http://*.doubleclick.net/*",
-		"*://*.googleadservices.com/*",
-		"*://*.googlesyndication.com/*",
-		"*://*.google-analytics.com/*",
-		"*://creative.ak.fbcdn.net/*",
-		"http://*.adbrite.com/*",
-		"http://*.expo9.exponential.com/*",
-		"http://*.quantserve.com/*",
-		"http://*.scorecardresearch.com/*",
-		"http://*.zedo.com/*"
-	];
-	//当前需要屏蔽的广告链接
-	function getCurrentBlockUrls(){
-		if(null==currentBlockUrls){
-			currentBlockUrls=getBlockUrls();
-		}
-		return currentBlockUrls;
-	}
+﻿start();
+
+
+chrome.contextMenus.create({
+    type: 'normal',
+    title: '屏蔽广告',
+	onclick: blockAD,
+    id: 'adkiller'
+	,contexts: ['all']
 	
-	function getBlockUrls(){
-	     var blockUrlsStr=localStorage["BlockUrls"];
-		 var urls=null;
-		 if(blockUrlsStr){
-			try{
-				urls=JSON.parse(blockUrlsStr);
-			}catch(error){
-				console.log(error);
-			}
-		 }
-		 if (!(urls instanceof Array)||urls.length<=0) {
-			urls=defaultBlockUrls;
-			setBlockUrls(urls);
-			console.log("Initializing BlockUrls to defaults.");
-		}
-		return urls; 
-	}
-	
-	function setBlockUrls(urls) {
-		currentBlockUrls=urls;
-		localStorage["BlockUrls"] = JSON.stringify(urls);
-   }
-   return {
-	   getCurrentBlockUrls:getCurrentBlockUrls,
-	   getBlockUrls:getBlockUrls,
-	   setBlockUrls:setBlockUrls
-   };
-}());
-
-
-
-
-var blockAdCount=0;
-chrome.webRequest.onBeforeRequest.addListener(function(details) {  
-        blockAdCount++;
-		setBadge(blockAdCount);
-		//return {cancel: true};
-		return {redirectUrl: "about:blank"};
-},{urls: BlockUrlMgr.getCurrentBlockUrls()},["blocking"]);
-
-//新页面打开，blockAdCount重置为0
-chrome.extension.onRequest.addListener(function(message, sender, sendResponse){
-     blockAdCount=0;
-	 console.log(message);
-	 sendResponse("知道了");
 });
+function blockAD(info, tab){
+	console.log("info:",info);
+	console.log("tab:",tab);
+}
 
-//设置提示，提示在当前页面挡住了多少广告
+function start(){
+	addADListener();
+}
+
+function restart(){
+	removeADListener();
+	start();
+}
+
+function addADListener(){
+chrome.webRequest.onBeforeRequest.addListener(onBeforeRequestCallBack, 
+												{ urls:  BlockUrlMgr.getBlockUrls() }, 
+												["blocking"]);
+}
+
+function removeADListener(){
+	chrome.webRequest.onBeforeRequest.removeListener(onBeforeRequestCallBack);
+}
+
+
+function onBeforeRequestCallBack(details) {
+    var counter = CounterMgr.addBlockUrl(details.tabId, details.url);
+    setBadge(counter.count);
+    return { redirectUrl: "about:blank" };
+}
+
+
+//设置提示，提示在当前页面屏蔽了多少广告
 function setBadge(count){
 	chrome.tabs.getSelected(null, function(tab) {
 		chrome.browserAction.setBadgeBackgroundColor({tabId:tab.id,color: '#0000FF'});
-		chrome.browserAction.setBadgeText({tabId:tab.id,text: count.toString()});
+		chrome.browserAction.setBadgeText({ tabId: tab.id, text: count.toString() });
 	});
 }
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    // console.log('Tab ' + tabId + ' has been changed with these options:');
+    if (changeInfo.status == "loading") {//当页面从新加载，重置广告计数器
+        CounterMgr.reset(tabId);
+    } else if (changeInfo.status == "complete") {
+
+    }
+});
+
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+    CounterMgr.removeCounter(tabId);
+    //console.log('Tab ' + tabId + ' in window ' + removeInfo.windowId + ', and the window is ' + (removeInfo.isWindowClosing ? 'closed.' : 'open.'));
+});
 
 
 
