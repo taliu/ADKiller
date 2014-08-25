@@ -41,6 +41,20 @@ var BlockUrlMgr=(function(){
 		return urls; 
 	}
 	
+	function getFromFile(callBack){
+		chrome.fileSystem.chooseEntry({type: 'openFile'}, function(fileEntry){
+			fileEntry.file(function(file){
+				var reader = new FileReader();
+				reader.onload = function(){
+					var text = this.result;
+					callBack(text)
+					//do something with text
+				}
+				reader.readAsText(File);
+			});
+		});
+	}
+	
 	function addBlockUrl(url){
 		var blockUrls=getBlockUrls();
 		if(blockUrls.indexOf(url)==-1){

@@ -4,10 +4,15 @@
 	"version":"1.0.0",
 	"background":{"scripts":["CounterMgr.js","BlockUrlMgr.js","background.js"]},
 	"browser_action": {
-    "default_icon": "cnblogs_19.png",  
+    "default_icon": "ad19.png",  
     "default_title": "广告杀手",       
     "default_popup": "popup.html"        
     },
+	"icons":{
+    "16": "ad16.png",             
+    "48": "ad48.png",            
+    "128": "ad128.png" 
+    },  
 	"permissions":["contextMenus","http://*/*","webRequest","webRequestBlocking","tabs"],
 	"content_scripts":[{
 		"matches":["http://*/*"],
