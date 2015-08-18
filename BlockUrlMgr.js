@@ -13,6 +13,7 @@ var BlockUrlMgr=(function(){
 		"http://*.expo9.exponential.com/*",
 		"http://*.quantserve.com/*",
 		"http://*.scorecardresearch.com/*",
+		"http://pos.baidu.com/*",
 		"http://*.zedo.com/*"
 	];
 	//当前需要屏蔽的广告链接
@@ -35,7 +36,7 @@ var BlockUrlMgr=(function(){
 		 }
 		 if (!(urls instanceof Array)||urls.length<=0) {
 			urls=defaultBlockUrls;
-			setBlockUrls(urls);
+			saveBlockUrls(urls);
 			console.log("Initializing BlockUrls to defaults.");
 		}
 		return urls; 
