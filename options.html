@@ -1,9 +1,9 @@
 ﻿<html>
 	<head>
-		<link href="bootstrap.min.css" rel="stylesheet">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body class="container">
-	 
+      
 		<table id="table" class="table table-bordered table-hover">
 		   <thead>
 		     <tr>
@@ -17,12 +17,24 @@
 		   <tfoot>
 			<tr>
 				<td colspan="2"><input type="text" id="url" class="form-control"/></td>
-				<td><a id="addUrl" href="#">添加</a></td>
+				<td><a id="addUrl"  style='cursor:pointer'>添加</a></td>
 			</tr>
 		   </tfoot>
 		</table>
-		<button class="btn btn-large btn-primary" type="button" id="saveBtn">保存修改</button>
-		<script src="jquery-2.0.0.min.js"></script>
-		<script src="options.js"></script>
+        <div class="alert alert-success alert-dismissible" style="display:none" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            已经<span id="msgTip"></span>
+        </div>
+
+		<button class="btn btn-large btn-primary" type="button" id="saveBtn">立即生效</button>
+		<button class="btn btn-large btn-primary" type="button" id="updateBtn">同步更新</button>
+
+        <p style="margin:20px;"></p>
+       
+
+		<script src="js/jquery-2.0.0.min.js"></script>
+		<script src="js/options.js"></script>
+      
+
 	</body>
 </html>

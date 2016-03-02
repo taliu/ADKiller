@@ -2,22 +2,22 @@
 	"manifest_version":2,
 	"name":"广告杀手",
 	"version":"1.0.0",
-	"background":{"scripts":["CounterMgr.js","BlockUrlMgr.js","background.js"]},
+	"background":{"scripts":["js/jquery-2.0.0.min.js","js/CounterMgr.js","js/BlockUrlMgr.js","js/background.js"]},
 	"browser_action": {
-    "default_icon": "ad19.png",  
+    "default_icon": "images/ad19.png",  
     "default_title": "广告杀手",       
     "default_popup": "popup.html"        
     },
 	"icons":{
-    "16": "ad16.png",             
-    "48": "ad48.png",            
-    "128": "ad128.png" 
+    "16": "images/ad16.png",             
+    "48": "images/ad48.png",            
+    "128": "images/ad128.png" 
     },  
-	"permissions":["contextMenus","http://*/*","webRequest","webRequestBlocking","tabs"],
+	"permissions":["contextMenus","http://*/*","https://*/*","webRequest","webRequestBlocking","tabs"],
 	"content_scripts":[{
-		"matches":["http://*/*"],
-		"js":["jquery-2.0.0.min.js","content_script.js"]
+		"matches":["http://*/*","https://*/*"],
+		"js":["js/jquery-2.0.0.min.js","js/content_script.js"]
 	}],
 	"options_page": "options.html",
-	"web_accessible_resources":["jquery.min.map"]
+	"web_accessible_resources":["js/jquery.min.map"]
 }
